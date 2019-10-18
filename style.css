@@ -9,3 +9,14 @@
 .high-usage {
   color: red;
 }
+
+.box {
+  background-image: linear-gradient(red, yellow);
+  width: 400px;
+  height: 400px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
