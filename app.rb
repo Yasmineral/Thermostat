@@ -1,9 +1,11 @@
-# require 'sinatra'
-# require 'json'
+require 'sinatra'
+require 'sinatra/base'
+require 'sinatra/activerecord'
+require 'json'
+require_relative 'model'
 
-# set :database_file, 'config/database.yml'
 
-
+set :database_file, 'config/database.yml'
 
   # get '/time.json' do 
     # headers 'Access-Control-Allow-Origin' => '*' 
@@ -12,6 +14,32 @@
     # { time: Time.now.to_s}.to_json
   # end
 
+class Thermostat < Sinatra::Base
+  enable :sessions 
+  register Sinatra::ActiveRecordExtension
 
-# run! if app_file == $0
-# end
+
+  get '/' do
+    erb :index
+  end
+  
+  get '/temperature' do
+    Temperatures.find(1).temperature.to_json
+  end
+
+  get '/psm' do
+    Temperatures.find(1).psm.to_json
+  end
+
+  post '/temperature' do
+    Temperatures.find(1).update_attribute(:temperature, params[:temperature])
+  end
+
+  post '/psm' do
+    p params
+    Temperatures.find(1).update_attribute(:psm, params[:psm])
+  end
+
+run! if app_file == $0
+end
+

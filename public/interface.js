@@ -4,34 +4,49 @@ $(document).ready(function() {
 
   $('#temperature-up').click(function() { // event listner
     thermostat.increaseTemperature(); // update model
+    sendTemp();
     updateTemperature() // update view
   })
 
   $('#temperature-down').click(function() {
     thermostat.decreaseTemperature();
+    sendTemp();
     updateTemperature()
   })
 
   $('#temperature-reset').click(function() {
     thermostat.resetTemperature();
+    sendTemp();
     updateTemperature()
   })
 
   $('#powersaving-on').click(function() {
     thermostat.switchPowerSavingModeOn();
-    $('#power-saving-status').text('on')
+    updatePowerSaveStatus()
+    sendPsm()
     updateTemperature();
   })
 
   $('#powersaving-off').click(function() {
     thermostat.switchPowerSavingModeOff();
-    $('#power-saving-status').text('off')
+    updatePowerSaveStatus()
+    sendPsm()
     updateTemperature();
   })
 
   function updateTemperature() {
     $('#temperature').text(thermostat.temperature);
     $('#temperature').attr('class', thermostat.energyUsage());
+  }
+
+  function updatePowerSaveStatus() {
+    console.log(thermostat.powerSavingMode)
+    if (thermostat.powerSavingMode === true) {
+      $('#power-saving-status').text('on')
+    }
+    else {
+      $('#power-saving-status').text('off')
+    }
   }
 
   function displayWeather(city) {
@@ -49,4 +64,26 @@ $(document).ready(function() {
     var city = $('#current-city').val();
     displayWeather(city);
   })
+
+  function sendTemp() {
+    var temperature = { temperature: thermostat.temperature }
+    $.post("/temperature", temperature)
+  }
+
+  $.get("/temperature", function(response) {
+    thermostat.temperature = Number(response)
+    //json is returned as text. Number converts to number.
+    updateTemperature()
+  })
+  
+  function sendPsm() {
+    var psm = { psm: thermostat.powerSavingMode }
+    $.post("/psm", psm)
+  }
+
+  $.get("/psm", function(response) {
+    thermostat.powerSavingMode = JSON.parse(response)
+    updatePowerSaveStatus()
+  })
+
 })
